@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { Heart, Phone, MessageCircle } from "lucide-react"
+import { INTERACTION_STRENGTH_INCREASE } from "@/lib/utils"
 
 interface InteractionModalProps {
   isOpen: boolean
@@ -42,12 +43,16 @@ export default function InteractionModal({ isOpen, onClose, onInteraction, relat
               <SelectValue placeholder="Select activity type" />
             </SelectTrigger>
             <SelectContent>
-              {Object.entries(activityIcons).map(([activity, Icon]) => (
-                <SelectItem key={activity} value={activity} className="flex items-center gap-2">
-                  <Icon className="w-4 h-4" />
-                  <span>{activity}</span>
-                </SelectItem>
-              ))}
+              {Object.entries(INTERACTION_STRENGTH_INCREASE).map(([activity, strength]) => {
+                const Icon = activityIcons[activity as keyof typeof activityIcons]
+                return (
+                  <SelectItem key={activity} value={activity} className="flex items-center gap-2">
+                    <Icon className="w-4 h-4" />
+                    <span>{activity}</span>
+                    <span className="ml-auto text-sm text-gray-500">+{strength}</span>
+                  </SelectItem>
+                )
+              })}
             </SelectContent>
           </Select>
           <Textarea
@@ -58,10 +63,8 @@ export default function InteractionModal({ isOpen, onClose, onInteraction, relat
           />
         </div>
         <DialogFooter>
-          <Button onClick={onClose} variant="neutral">
-            Cancel
-          </Button>
-          <Button onClick={handleSubmit} disabled={!activityType}>
+          <Button onClick={onClose}>Cancel</Button>
+          <Button onClick={handleSubmit} disabled={!activityType} className="bg-blue-500 hover:bg-blue-600 text-white">
             Submit
           </Button>
         </DialogFooter>

@@ -7,7 +7,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 
 interface RelationshipListProps {
   relationships: Relationship[]
-  onInteraction: (id: number, amount: number) => void
+  onInteraction: (id: number, interactionType: string) => void
   onEdit: (id: number, name: string, type: Relationship["type"], imageUrl?: string) => void
 }
 
@@ -36,10 +36,9 @@ export default function RelationshipList({ relationships, onInteraction, onEdit 
     setSelectedRelationship(null)
   }
 
-  const handleInteraction = (activityType: string) => {
+  const handleInteraction = (interactionType: string) => {
     if (selectedRelationship) {
-      const amount = activityType === "Spent time together" ? 20 : 10
-      onInteraction(selectedRelationship.id, amount)
+      onInteraction(selectedRelationship.id, interactionType)
     }
     handleCloseModal()
   }

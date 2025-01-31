@@ -9,14 +9,11 @@ import Header from "@/components/header/header"
 import RelationshipList from "@/components/relationship-list/relationship-list"
 import AddRelationshipModal from "@/components/add-relationship-modal/add-relationship-modal"
 import SortFilterControls from "@/components/sort-filter-controls/sort-filter-controls"
+import { RELATIONSHIP_DRAIN_RATE, calculateNewStrength } from "@/lib/utils"
+import { initialRelationships } from "@/lib/data"
 
 export default function RelationshipMeterContainer() {
-  const [relationships, setRelationships] = useState<Relationship[]>([
-    { id: 1, name: "Mom", strength: 100, type: "family" },
-    { id: 2, name: "John (Best Friend)", strength: 85, type: "friend" },
-    { id: 3, name: "Sarah (Colleague)", strength: 70, type: "acquaintance" },
-    { id: 4, name: "Partner", strength: 95, type: "significant_other" },
-  ])
+  const [relationships, setRelationships] = useState<Relationship[]>(initialRelationships)
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   const [sortBy, setSortBy] = useState("name")
   const [filterText, setFilterText] = useState("")
@@ -26,7 +23,7 @@ export default function RelationshipMeterContainer() {
       setRelationships((prevRelationships) =>
         prevRelationships.map((relationship) => ({
           ...relationship,
-          strength: Math.max(0, relationship.strength - 0.1),
+          strength: Math.max(0, relationship.strength - RELATIONSHIP_DRAIN_RATE),
         })),
       )
     }, 1000)
@@ -34,11 +31,11 @@ export default function RelationshipMeterContainer() {
     return () => clearInterval(interval)
   }, [])
 
-  const handleInteraction = (id: number, amount: number) => {
+  const handleInteraction = (id: number, interactionType: string) => {
     setRelationships((prevRelationships) =>
       prevRelationships.map((relationship) =>
         relationship.id === id
-          ? { ...relationship, strength: Math.min(100, relationship.strength + amount) }
+          ? { ...relationship, strength: calculateNewStrength(relationship.strength, interactionType) }
           : relationship,
       ),
     )

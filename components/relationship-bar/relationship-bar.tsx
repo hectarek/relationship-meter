@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { Plus, Users, Heart, User, UserPlus, Edit } from "lucide-react"
 import type { Relationship } from "@/types"
+import { getStatusColor, getStatusText, getRelationshipIcon } from "@/lib/utils"
 
 interface RelationshipBarProps {
   relationship: Relationship
@@ -13,31 +14,13 @@ interface RelationshipBarProps {
 }
 
 export default function RelationshipBar({ relationship, onInteraction, onEdit }: RelationshipBarProps) {
-  const getStatusColor = (strength: number) => {
-    if (strength > 75) return "green"
-    if (strength > 50) return "yellow"
-    if (strength > 25) return "orange"
-    return "red"
-  }
-
-  const getStatusText = (strength: number) => {
-    if (strength > 66) return "Strong"
-    if (strength > 33) return "Needs Attention"
-    return "Fading"
-  }
-
-  const getRelationshipIcon = (type: Relationship["type"]) => {
-    switch (type) {
-      case "family":
-        return <Users className="h-4 w-4" />
-      case "significant_other":
-        return <Heart className="h-4 w-4" />
-      case "friend":
-        return <User className="h-4 w-4" />
-      case "acquaintance":
-        return <UserPlus className="h-4 w-4" />
-    }
-  }
+  const IconComponent =
+    {
+      Users,
+      Heart,
+      User,
+      UserPlus,
+    }[getRelationshipIcon(relationship.type)] || Users
 
   return (
     <Card className="hover:shadow-md transition-shadow duration-200">
@@ -52,8 +35,8 @@ export default function RelationshipBar({ relationship, onInteraction, onEdit }:
               <span className="font-semibold text-lg">{relationship.name}</span>
               <div className="flex items-center space-x-2">
                 <Badge className="text-xs">
-                  {getRelationshipIcon(relationship.type)}
-                  <span className="ml-1">{getStatusText(relationship.strength)}</span>
+                  <IconComponent className="h-4 w-4 mr-1" />
+                  <span>{getStatusText(relationship.strength)}</span>
                 </Badge>
                 <Button size="icon" onClick={onEdit} className="h-8 w-8">
                   <Edit className="h-4 w-4" />
@@ -64,7 +47,7 @@ export default function RelationshipBar({ relationship, onInteraction, onEdit }:
             <Progress
               value={relationship.strength}
               className="h-2 mb-2"
-              variant={getStatusColor(relationship.strength)}
+              variant={getStatusColor(relationship.strength) as "default" | "green" | "yellow" | "orange" | "red"}
             />
             <div className="flex justify-between items-center">
               <span className="text-sm font-medium">{Math.round(relationship.strength)}%</span>

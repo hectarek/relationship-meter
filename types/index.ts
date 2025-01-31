@@ -3,5 +3,6 @@ export interface Relationship {
     name: string
     strength: number
     type: "family" | "significant_other" | "friend" | "acquaintance"
+    imageUrl?: string
 }
 

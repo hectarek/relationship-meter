@@ -43,7 +43,7 @@ export default function InteractionModal({ isOpen, onClose, onInteraction, relat
             </SelectTrigger>
             <SelectContent>
               {Object.entries(activityIcons).map(([activity, Icon]) => (
-                <SelectItem key={activity} value={activity} className="flex items-center space-x-2">
+                <SelectItem key={activity} value={activity} className="flex items-center gap-2">
                   <Icon className="w-4 h-4" />
                   <span>{activity}</span>
                 </SelectItem>
@@ -58,10 +58,10 @@ export default function InteractionModal({ isOpen, onClose, onInteraction, relat
           />
         </div>
         <DialogFooter>
-          <Button onClick={onClose}>
+          <Button onClick={onClose} variant="neutral">
             Cancel
           </Button>
-          <Button onClick={handleSubmit} disabled={!activityType} className="bg-blue-500 hover:bg-blue-600 text-white">
+          <Button onClick={handleSubmit} disabled={!activityType}>
             Submit
           </Button>
         </DialogFooter>

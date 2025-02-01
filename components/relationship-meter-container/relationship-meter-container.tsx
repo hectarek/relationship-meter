@@ -9,21 +9,24 @@ import Header from "@/components/header/header"
 import RelationshipList from "@/components/relationship-list/relationship-list"
 import AddRelationshipModal from "@/components/add-relationship-modal/add-relationship-modal"
 import SortFilterControls from "@/components/sort-filter-controls/sort-filter-controls"
-import { RELATIONSHIP_DRAIN_RATE, calculateNewStrength } from "@/lib/utils"
+import { calculateNewStrength } from "@/lib/utils"
+import { calculateDrainRate } from "@/lib/utils"
 import { initialRelationships } from "@/lib/data"
 
 export default function RelationshipMeterContainer() {
   const [relationships, setRelationships] = useState<Relationship[]>(initialRelationships)
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   const [sortBy, setSortBy] = useState("name")
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc")
   const [filterText, setFilterText] = useState("")
+  const [isGrouped, setIsGrouped] = useState(true)
 
   useEffect(() => {
     const interval = setInterval(() => {
       setRelationships((prevRelationships) =>
         prevRelationships.map((relationship) => ({
           ...relationship,
-          strength: Math.max(0, relationship.strength - RELATIONSHIP_DRAIN_RATE),
+          strength: Math.max(0, relationship.strength - calculateDrainRate(relationship)),
         })),
       )
     }, 1000)
@@ -41,16 +44,26 @@ export default function RelationshipMeterContainer() {
     )
   }
 
-  const handleAddRelationship = (name: string, type: Relationship["type"]) => {
+  const handleAddRelationship = (
+    name: string,
+    type: Relationship["type"],
+    maintenanceLevel: Relationship["maintenanceLevel"],
+  ) => {
     const newId = Math.max(...relationships.map((r) => r.id), 0) + 1
-    setRelationships([...relationships, { id: newId, name, strength: 50, type }])
+    setRelationships([...relationships, { id: newId, name, strength: 50, type, maintenanceLevel }])
     setIsAddModalOpen(false)
   }
 
-  const handleEditRelationship = (id: number, name: string, type: Relationship["type"], imageUrl?: string) => {
+  const handleEditRelationship = (
+    id: number,
+    name: string,
+    type: Relationship["type"],
+    maintenanceLevel: Relationship["maintenanceLevel"],
+    imageUrl?: string,
+  ) => {
     setRelationships((prevRelationships) =>
       prevRelationships.map((relationship) =>
-        relationship.id === id ? { ...relationship, name, type, imageUrl } : relationship,
+        relationship.id === id ? { ...relationship, name, type, maintenanceLevel, imageUrl } : relationship,
       ),
     )
   }
@@ -60,15 +73,22 @@ export default function RelationshipMeterContainer() {
       .filter((relationship) => relationship.name.toLowerCase().includes(filterText.toLowerCase()))
       .sort((a, b) => {
         if (sortBy === "name") {
-          return a.name.localeCompare(b.name)
+          return sortOrder === "asc" ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name)
         } else if (sortBy === "strength") {
-          return b.strength - a.strength
-        } else if (sortBy === "type") {
-          return a.type.localeCompare(b.type)
+          return sortOrder === "asc" ? a.strength - b.strength : b.strength - a.strength
         }
         return 0
       })
-  }, [relationships, filterText, sortBy])
+  }, [relationships, filterText, sortBy, sortOrder])
+
+  const handleSortChange = (newSortBy: string) => {
+    if (newSortBy === sortBy) {
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc")
+    } else {
+      setSortBy(newSortBy)
+      setSortOrder("asc")
+    }
+  }
 
   return (
     <div className="py-8 px-4 sm:px-6 lg:px-8 transition-colors duration-200">
@@ -84,14 +104,22 @@ export default function RelationshipMeterContainer() {
         </div>
         <SortFilterControls
           sortBy={sortBy}
-          onSortChange={setSortBy}
+          sortOrder={sortOrder}
+          onSortChange={handleSortChange}
           filterText={filterText}
           onFilterChange={setFilterText}
+          isGrouped={isGrouped}
+          onGroupToggle={() => setIsGrouped(!isGrouped)}
+          sortOptions={[
+            { value: "name", label: "Name" },
+            { value: "strength", label: "Strength" },
+          ]}
         />
         <RelationshipList
           relationships={filteredAndSortedRelationships}
           onInteraction={handleInteraction}
           onEdit={handleEditRelationship}
+          isGrouped={isGrouped}
         />
       </div>
       <AddRelationshipModal

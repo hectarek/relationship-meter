@@ -11,18 +11,20 @@ import type { Relationship } from "@/types";
 interface EditRelationshipModalProps {
 	isOpen: boolean;
 	onClose: () => void;
-	onEdit: (id: number, name: string, type: Relationship["type"], imageUrl?: string) => void;
+	onEdit: (id: number, name: string, type: Relationship["type"], maintenanceLevel: Relationship["maintenanceLevel"], imageUrl?: string) => void;
 	relationship: Relationship;
 }
 
 export default function EditRelationshipModal({ isOpen, onClose, onEdit, relationship }: EditRelationshipModalProps) {
 	const [name, setName] = useState(relationship.name);
 	const [type, setType] = useState<Relationship["type"]>(relationship.type);
+	const [maintenanceLevel, setMaintenanceLevel] = useState<Relationship["maintenanceLevel"]>(relationship.maintenanceLevel);
 	const [imageUrl, setImageUrl] = useState<string | undefined>(relationship.imageUrl);
 
 	useEffect(() => {
 		setName(relationship.name);
 		setType(relationship.type);
+		setMaintenanceLevel(relationship.maintenanceLevel);
 		setImageUrl(relationship.imageUrl);
 	}, [relationship]);
 
@@ -45,14 +47,14 @@ export default function EditRelationshipModal({ isOpen, onClose, onEdit, relatio
 
 	const handleSubmit = () => {
 		if (name.trim()) {
-			onEdit(relationship.id, name.trim(), type, imageUrl);
+			onEdit(relationship.id, name.trim(), type, maintenanceLevel, imageUrl);
 			onClose();
 		}
 	};
 
 	return (
 		<Dialog open={isOpen} onOpenChange={onClose}>
-			<DialogContent className="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-2 border-black">
+			<DialogContent>
 				<DialogHeader>
 					<DialogTitle className="text-2xl font-semibold">Edit Relationship</DialogTitle>
 				</DialogHeader>
@@ -71,12 +73,12 @@ export default function EditRelationshipModal({ isOpen, onClose, onEdit, relatio
 					</div>
 					<div className="space-y-2">
 						<Label htmlFor="edit-name">Name</Label>
-						<Input id="edit-name" placeholder="Enter name" value={name} onChange={(e) => setName(e.target.value)} className="border-2 border-black" />
+						<Input id="edit-name" placeholder="Enter name" value={name} onChange={(e) => setName(e.target.value)} />
 					</div>
 					<div className="space-y-2">
 						<Label htmlFor="edit-type">Relationship Type</Label>
 						<Select value={type} onValueChange={(value) => setType(value as Relationship["type"])}>
-							<SelectTrigger id="edit-type" className="border-2 border-black">
+							<SelectTrigger id="edit-type">
 								<SelectValue placeholder="Select relationship type" />
 							</SelectTrigger>
 							<SelectContent>
@@ -84,12 +86,26 @@ export default function EditRelationshipModal({ isOpen, onClose, onEdit, relatio
 								<SelectItem value="significant_other">Significant Other</SelectItem>
 								<SelectItem value="friend">Friend</SelectItem>
 								<SelectItem value="acquaintance">Acquaintance</SelectItem>
+								<SelectItem value="colleague">Colleague</SelectItem>
+							</SelectContent>
+						</Select>
+					</div>
+					<div className="space-y-2">
+						<Label htmlFor="edit-maintenance">Maintenance Level</Label>
+						<Select value={maintenanceLevel} onValueChange={(value) => setMaintenanceLevel(value as Relationship["maintenanceLevel"])}>
+							<SelectTrigger id="edit-maintenance">
+								<SelectValue placeholder="Select maintenance level" />
+							</SelectTrigger>
+							<SelectContent>
+								<SelectItem value="low">Low</SelectItem>
+								<SelectItem value="medium">Medium</SelectItem>
+								<SelectItem value="high">High</SelectItem>
 							</SelectContent>
 						</Select>
 					</div>
 				</div>
 				<DialogFooter>
-					<Button onClick={onClose} variant="neutral" className="border-2 border-black">
+					<Button onClick={onClose}>
 						Cancel
 					</Button>
 					<Button onClick={handleSubmit} disabled={!name.trim()}>

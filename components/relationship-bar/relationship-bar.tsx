@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
-import { Plus, Users, Heart, User, UserPlus, Edit } from "lucide-react"
+import { Plus, Users, Heart, User, UserPlus, Briefcase, Edit, Wrench } from "lucide-react"
 import type { Relationship } from "@/types"
 import { getStatusColor, getStatusText, getRelationshipIcon } from "@/lib/utils"
 
@@ -20,6 +20,7 @@ export default function RelationshipBar({ relationship, onInteraction, onEdit }:
       Heart,
       User,
       UserPlus,
+      Briefcase,
     }[getRelationshipIcon(relationship.type)] || Users
 
   return (
@@ -36,7 +37,11 @@ export default function RelationshipBar({ relationship, onInteraction, onEdit }:
               <div className="flex items-center space-x-2">
                 <Badge className="text-xs">
                   <IconComponent className="h-4 w-4 mr-1" />
-                  <span>{getStatusText(relationship.strength)}</span>
+                  <span>{relationship.type.replace("_", " ")}</span>
+                </Badge>
+                <Badge className="text-xs">
+                  <Wrench className="h-4 w-4 mr-1" />
+                  <span>{relationship.maintenanceLevel}</span>
                 </Badge>
                 <Button size="icon" onClick={onEdit} className="h-8 w-8">
                   <Edit className="h-4 w-4" />
@@ -50,7 +55,10 @@ export default function RelationshipBar({ relationship, onInteraction, onEdit }:
               variant={getStatusColor(relationship.strength) as "default" | "green" | "yellow" | "orange" | "red"}
             />
             <div className="flex justify-between items-center">
-              <span className="text-sm font-medium">{Math.round(relationship.strength)}%</span>
+              <div className="flex items-center space-x-2">
+                <span className="text-sm font-medium">{Math.round(relationship.strength)}%</span>
+                <span className="text-sm text-muted-foreground">({getStatusText(relationship.strength)})</span>
+              </div>
               <Button size="sm" onClick={onInteraction}>
                 <Plus className="mr-1 h-4 w-4" /> Interact
               </Button>

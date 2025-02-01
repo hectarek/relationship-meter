@@ -1,8 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { fontMono, fontSans } from "@/lib/fonts";
 import { cn } from "@/lib/utils";
-import "@/app/globals.css"
-import { Providers } from "@/providers/providers";
+import "@/app/globals.css";
+import { Providers, ThemeProvider } from "@/providers/providers";
 
 export const viewport: Viewport = {
 	initialScale: 1,
@@ -24,7 +24,9 @@ export default function RootLayout({
 		<Providers>
 			<html lang="en" suppressHydrationWarning={true}>
 				<body suppressHydrationWarning={true} className={cn("w-full overflow-x-hidden h-svh font-sans antialiased bg-bg", fontSans.variable, fontMono.variable)}>
-					{children}
+					<ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+						{children}
+					</ThemeProvider>
 				</body>
 			</html>
 		</Providers>
